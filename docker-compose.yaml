@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  sticker-scraper:
+    env_file: ".env"
+    container_name: sticker-scraper
+    build:
+      context: ./sticker-scraper
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - buff163-scraper
+    depends_on:
+      - mongo
+  mongo:
+    container_name: mongo
+    image: mongo:4.0.28-xenial
+    ports:
+      - "27017:27017"
+    networks:
+      - buff163-scraper
+    volumes:
+      - mongo-data:/data/db
+
+networks:
+  buff163-scraper:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
