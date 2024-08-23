@@ -1,4 +1,3 @@
-import { Types } from "mongoose";
 import { Sticker, ISticker } from "./Sticker.js"
 import { StickerDTO } from "./StickerDTO.js"
 

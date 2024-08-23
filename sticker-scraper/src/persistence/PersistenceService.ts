@@ -1,5 +1,5 @@
 import { DataConversion } from "./DataConversion.js";
-import { Sticker, ISticker } from "./Sticker.js";
+import { Sticker } from "./Sticker.js";
 import { StickerDTO } from "./StickerDTO.js";
 
 export class PersistenceService{

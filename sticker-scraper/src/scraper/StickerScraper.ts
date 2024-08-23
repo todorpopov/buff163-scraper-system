@@ -1,6 +1,4 @@
 import { PersistenceService } from "../persistence/PersistenceService.js";
-import { DataConversion } from "../persistence/DataConversion.js";
-import { Sticker } from "../persistence/Sticker.js";
 import { StickerDTO } from "../persistence/StickerDTO.js";
 import { ScraperUtils } from "./ScraperUtils.js"
 
