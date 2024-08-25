@@ -1,5 +1,5 @@
 import { PersistenceService } from "../persistence/PersistenceService.js";
-import { StickerDTO } from "../persistence/StickerDTO.js";
+import { StickerDTO } from "../persistence/data/StickerDTO.js";
 import { ScraperUtils } from "./ScraperUtils.js"
 
 export class StickerScraper {
@@ -10,7 +10,7 @@ export class StickerScraper {
     constructor(){
         this.shouldScrape = true;
         this.stickerCodes = ScraperUtils.parseStickerCodesFile()
-        this.scrapeDelay = 2000;
+        this.scrapeDelay = 4000;
     }
 
     private async scrapePage(stickerCode: string){

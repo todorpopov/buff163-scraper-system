@@ -1,3 +1,7 @@
+import { IItem } from "../persistence/data/Item.js";
+import { ItemDTO } from "../persistence/data/ItemDTO.js";
+import { DataConversion } from "../persistence/DataConversion.js";
+import { PersistenceService } from "../persistence/PersistenceService.js";
 import { ScraperUtils } from "../scraper/ScraperUtils.js"
 
 export class ItemScraper {
@@ -8,12 +12,13 @@ export class ItemScraper {
     constructor(){
         this.shouldScrape = true;
         this.itemCodes = ScraperUtils.parseItemCodesFile()
-        this.scrapeDelay = 1000;
+        this.scrapeDelay = 3000;
     }
 
     public async scrapePage(itemCode: string){
+        const start = performance.now()
         const itemURL = ScraperUtils.getItemURL(itemCode)
-        let pageData = await fetch(itemURL, ScraperUtils.getRequestOptions()).then(res => {
+        let pageData = await fetch(itemURL, ScraperUtils.getItemRequestOptions()).then(res => {
             if(res.status !== 200){
                 console.log(`\nStatus code: ${res.status}!`)
             }
@@ -51,11 +56,13 @@ export class ItemScraper {
 
         const editedItems = ScraperUtils.getItems(commonProperties)
 
-        editedItems.forEach(async (item) => {
-            console.log(`\nItem code ${itemCode} has been scraped successfully!`)
-            // await this.saveToDB(item)
-            // this.saveToSubject(item)
+        editedItems.forEach(async (item: IItem) => {
+            const itemDto = new ItemDTO(item)
+            await PersistenceService.saveUnique(itemDto)
         })
+
+        const end = performance.now()
+        console.log(`Scraped: ${itemCode} | took: ${end - start}`)
     }
 
     private async scrapeItemCodes(){

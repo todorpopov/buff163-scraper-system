@@ -12,7 +12,7 @@ export class ScraperUtils {
         return itemName
     }
 
-    public static getRequestOptions() {
+    public static getItemRequestOptions() {
         const headers = new Headers();
         headers.append("accept", "application/json, text/javascript, */*; q=0.01")
         headers.append("accept-language", "bg-BG,bg;q=0.9,en;q=0.8")

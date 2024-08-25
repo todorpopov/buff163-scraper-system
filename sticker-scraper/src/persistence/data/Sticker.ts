@@ -7,7 +7,7 @@ export interface ISticker {
 }
 
 const stickerSchema = new Schema<ISticker>({
-    code: {type: String, required: true},
+    code: {type: String, required: true, unique: true},
     name: {type: String, required: true},
     price: {type: String, required: true}
 })

@@ -1,5 +1,5 @@
-import { Sticker, ISticker } from "./Sticker.js"
-import { StickerDTO } from "./StickerDTO.js"
+import { Sticker, ISticker } from "./data/Sticker.js"
+import { StickerDTO } from "./data/StickerDTO.js"
 
 export class DataConversion {
     public static toModel(stickerDto: StickerDTO) {

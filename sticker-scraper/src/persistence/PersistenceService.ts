@@ -1,6 +1,6 @@
 import { DataConversion } from "./DataConversion.js";
-import { Sticker } from "./Sticker.js";
-import { StickerDTO } from "./StickerDTO.js";
+import { Sticker } from "./data/Sticker.js";
+import { StickerDTO } from "./data/StickerDTO.js";
 
 export class PersistenceService{
     public static async saveOrUpdate(stickerDto: StickerDTO): Promise<void> {
@@ -37,5 +37,10 @@ export class PersistenceService{
 
     public static async dropAll(): Promise<void> {
         await Sticker.deleteMany({})
+    }
+
+    public static async getCount(): Promise<number> {
+        const stickers = await this.getAll()
+        return stickers.length
     }
 }

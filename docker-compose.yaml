@@ -1,6 +1,19 @@
 version: "3.8"
 
 services:
+  item-scraper:
+    env_file: ".env"
+    container_name: item-scraper
+    build:
+      context: ./item-scraper
+      dockerfile: Dockerfile
+    ports:
+      - "${ITEM_SCRAPER_PORT}:${ITEM_SCRAPER_PORT}"
+    networks:
+      - buff163-scraper
+    depends_on:
+      - mongo
+
   sticker-scraper:
     env_file: ".env"
     container_name: sticker-scraper
@@ -8,11 +21,12 @@ services:
       context: ./sticker-scraper
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "${STICKER_SCRAPER_PORT}:${STICKER_SCRAPER_PORT}"
     networks:
       - buff163-scraper
     depends_on:
       - mongo
+
   mongo:
     container_name: mongo
     image: mongo:4.0.28-xenial

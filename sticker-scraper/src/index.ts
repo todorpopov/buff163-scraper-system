@@ -4,7 +4,7 @@ import mongoose from "mongoose"
 import { PersistenceService } from "./persistence/PersistenceService.js"
 
 const app = express()
-const port = 3000
+const port = process.env.STICKER_SCRAPER_PORT
 const scraper = new StickerScraper()
 
 mongoose.connect('mongodb://mongo:27017/sticker-scraper', {
@@ -13,8 +13,8 @@ mongoose.connect('mongodb://mongo:27017/sticker-scraper', {
     () => {
         console.log("Successfully connected to MongoDB!")
         app.listen(port, () => {
-            console.log(`Express.js server running on port ${port}`)
-            // scraper.startScraping()
+            console.log(`Express.js sticker server listenning on port ${port}`)
+            scraper.startScraping()
         })
     },
     err => {
@@ -102,11 +102,21 @@ app.get("/stickers-api/get/current/scraping-status", (req, res) => {
     }
 })
 
+// get current sticker count
+app.get("/stickers-api/get/stickers/count", async (req, res) => {
+    try {
+        const count = await PersistenceService.getCount()
+        res.status(200).send(String(count))
+    } catch(err) {
+        res.status(500).send(err)
+    }
+})
+
 // drop all db entries
 app.delete("/stickers-api/drop-all", async (req, res) => {
     try {
         await PersistenceService.dropAll()
-        res.status(200).send("Stickers collection has been dropped!")
+        res.status(200).send("All documents in the collection deleted!")
     } catch(err) {
         res.status(500).send(err)
     }

@@ -1,32 +1,81 @@
+import mongoose from "mongoose"
 import { ItemScraper } from "./scraper/ItemScraper.js"
 import express from 'express'
+import { PersistenceService } from "./persistence/PersistenceService.js"
 
 const app = express()
-const port = 3000
+const port = process.env.ITEM_SCRAPER_PORT
 const scraper = new ItemScraper()
 
-app.get("/", (req, res) => {
-    res.send("Server running")
+mongoose.connect('mongodb://mongo:27017/item-scraper', {
+    serverSelectionTimeoutMS: 5000
+}).then(
+    () => {
+        console.log("Successfully connected to MongoDB!")
+        app.listen(port, () => {
+            console.log(`Express.js item server listenning on port ${port}`)
+            scraper.startScraping()
+        })
+    },
+    err => {
+        console.log(`DB connection error: ${err}`)
+    }
+)
+
+// use auth middleware
+app.use(function(req, res, next) {
+    if (req.headers.auth !== process.env.AUTH) {
+        return res.status(403).send("No credentials sent!");
+    }
+    next();
+});
+
+// start scraping process route
+app.put("/items-api/start", (req, res) => {
+    try {
+        scraper.startScraping()
+        res.status(200).send("Scraping process has started!")
+    } catch(err) {
+        res.status(500).send(err)
+    }
 })
 
-app.post("/items-api/scraper/start", (req, res) => {
-    scraper.startScraping()
-    res.send("Scraper started")
+// stop scraping process route
+app.put("/items-api/stop", (req, res) => {
+    try {
+        scraper.stopScraping()
+        res.status(200).send("Scraping process has stopped!")
+    } catch(err) {
+        res.status(500).send(err)
+    }
 })
 
-app.post("/items-api/scraper/stop", (req, res) => {
-    scraper.stopScraping()
-    res.send("Scraper stopped")
+// get all items route
+app.get("/items-api/get/items", async (req, res) => {
+    try {
+        const items = await PersistenceService.getAll()
+        res.status(200).send(items)
+    } catch(err) {
+        res.status(500).send(err)
+    }
 })
 
-app.post("/items-api/scraper/delay", (req, res) => {
-    const delay = String(req.query.delay)
-    console.log(delay)
-    scraper.changeScrapeDelay(delay)
-    res.send("Scraping delay changed")
+// get current item count
+app.get("/items-api/get/items/count", async (req, res) => {
+    try {
+        const count = await PersistenceService.getCount()
+        res.status(200).send(String(count))
+    } catch(err) {
+        res.status(500).send(err)
+    }
 })
 
-app.listen(port, () => {
-    console.log(`Server started on port ${port}`)
-    scraper.startScraping()
+// drop all db entries
+app.delete("/items-api/drop-all", async (req, res) => {
+    try {
+        await PersistenceService.dropAll()
+        res.status(200).send("All documents in the collection deleted!")
+    } catch(err) {
+        res.status(500).send(err)
+    }
 })
