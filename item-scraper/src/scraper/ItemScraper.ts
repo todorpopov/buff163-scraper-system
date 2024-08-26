@@ -1,6 +1,6 @@
+import { CachedSticker } from "../types/CachedSticker.js";
 import { IItem } from "../persistence/data/Item.js";
 import { ItemDTO } from "../persistence/data/ItemDTO.js";
-import { DataConversion } from "../persistence/DataConversion.js";
 import { PersistenceService } from "../persistence/PersistenceService.js";
 import { ScraperUtils } from "../scraper/ScraperUtils.js"
 
@@ -8,11 +8,12 @@ export class ItemScraper {
     private shouldScrape: boolean
     private itemCodes: Array<string>
     private scrapeDelay: number
+    private stickersCache: Array<CachedSticker>
 
     constructor(){
         this.shouldScrape = true;
         this.itemCodes = ScraperUtils.parseItemCodesFile()
-        this.scrapeDelay = 3000;
+        this.scrapeDelay = 5000;
     }
 
     public async scrapePage(itemCode: string){
@@ -49,6 +50,7 @@ export class ItemScraper {
 
         const commonProperties = {
             with_stickers: itemsWithStickers,
+            stickers_cache: this.stickersCache,
             item_img_url: itemImgURL,
             item_name: ScraperUtils.parseItemName(itemName),
             item_ref_price: itemReferencePrice, 
@@ -66,6 +68,7 @@ export class ItemScraper {
     }
 
     private async scrapeItemCodes(){
+        await this.updateStickersCache()
         for(const itemCode of this.itemCodes){
             if(!this.shouldScrape){
                 break;
@@ -91,5 +94,9 @@ export class ItemScraper {
 
     public changeScrapeDelay(newDelay: string) {
         this.scrapeDelay = Number(newDelay)
+    }
+
+    private async updateStickersCache() {
+        this.stickersCache = await ScraperUtils.fetchStickersCache()
     }
 }

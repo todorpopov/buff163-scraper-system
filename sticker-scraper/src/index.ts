@@ -114,8 +114,8 @@ app.get("/stickers-api/get/stickers/count", async (req, res) => {
     }
 })
 
-// drop all db entries
-app.delete("/stickers-api/drop-all", async (req, res) => {
+// delete all documents
+app.delete("/stickers-api/delete", async (req, res) => {
     try {
         await PersistenceService.dropAll()
         res.status(200).send("All documents in the collection deleted!")

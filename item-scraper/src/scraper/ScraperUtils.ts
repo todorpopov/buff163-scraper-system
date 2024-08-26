@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import { CachedSticker } from '../types/CachedSticker.js';
 
 export class ScraperUtils {
     public static getItemURL(itemCode: string){
@@ -33,7 +34,7 @@ export class ScraperUtils {
         return requestOptions;
     }
     
-    private static editItemStickers(stickersArray: Array<any>){
+    private static editItemStickers(stickersCache: Array<CachedSticker>, stickersArray: Array<any>){
         let stickersArrayCopy = [...stickersArray]
         stickersArrayCopy.map(sticker => {
             delete sticker.category
@@ -41,7 +42,7 @@ export class ScraperUtils {
             delete sticker?.offset_x
             delete sticker?.offset_y
         
-            sticker.price = -1
+            sticker.price = ScraperUtils.getStickerPrice(stickersCache, sticker.name)
         })
     
         return stickersArrayCopy
@@ -51,9 +52,9 @@ export class ScraperUtils {
         return `https://buff.163.com/shop/${userId}#tab=selling&game=csgo&page_num=1&search=${itemName.replaceAll(' ', '%20')}`
     }
 
-    public static getItems(properties: any){
+    public static getItems(properties){
         return properties.with_stickers.map(item => {
-            const stickers = this.editItemStickers(item.asset_info.info.stickers) 
+            const stickers = this.editItemStickers(properties.stickers_cache, item.asset_info.info.stickers) 
         
             return { 
                 id: item.asset_info.assetid,
@@ -82,5 +83,36 @@ export class ScraperUtils {
         }catch(error){
             console.error(error)
         }
+    }
+
+    private static getStickerPrice(stickersCache: Array<CachedSticker>, name: string) {
+        name = `Sticker | ${name}`
+        let itemPrice = -1
+        stickersCache.forEach(item => {
+            if(item.name === name){
+                itemPrice = Number(item.price)
+            }
+        })
+        return itemPrice
+    }
+
+    public static async fetchStickersCache(){
+        const requestOptions = {
+            headers: {
+                "auth": process.env.AUTH
+            },
+            method: "GET",
+        }
+
+        const stickers = await fetch(`http://sticker-scraper:${process.env.STICKER_SCRAPER_PORT}/stickers-api/get/stickers`, requestOptions)
+        .then(res => {
+            return res.json()
+        })
+        .catch(error => {
+            console.error(error)
+            return
+        })
+
+        return stickers
     }
 }

@@ -14,7 +14,7 @@ mongoose.connect('mongodb://mongo:27017/item-scraper', {
         console.log("Successfully connected to MongoDB!")
         app.listen(port, () => {
             console.log(`Express.js item server listenning on port ${port}`)
-            scraper.startScraping()
+            // scraper.startScraping()
         })
     },
     err => {
@@ -40,7 +40,7 @@ app.put("/items-api/start", (req, res) => {
     }
 })
 
-// stop scraping process route
+// stop scraping process
 app.put("/items-api/stop", (req, res) => {
     try {
         scraper.stopScraping()
@@ -50,7 +50,7 @@ app.put("/items-api/stop", (req, res) => {
     }
 })
 
-// get all items route
+// get all items
 app.get("/items-api/get/items", async (req, res) => {
     try {
         const items = await PersistenceService.getAll()
@@ -70,8 +70,8 @@ app.get("/items-api/get/items/count", async (req, res) => {
     }
 })
 
-// drop all db entries
-app.delete("/items-api/drop-all", async (req, res) => {
+// delete all documents
+app.delete("/items-api/delete", async (req, res) => {
     try {
         await PersistenceService.dropAll()
         res.status(200).send("All documents in the collection deleted!")
