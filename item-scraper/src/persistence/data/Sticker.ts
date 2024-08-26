@@ -5,4 +5,3 @@ export interface ISticker {
     wear: number,
     price: number
 }
-  

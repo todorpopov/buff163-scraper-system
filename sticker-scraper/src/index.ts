@@ -14,7 +14,7 @@ mongoose.connect('mongodb://mongo:27017/sticker-scraper', {
         console.log("Successfully connected to MongoDB!")
         app.listen(port, () => {
             console.log(`Express.js sticker server listenning on port ${port}`)
-            scraper.startScraping()
+            // scraper.startScraping()
         })
     },
     err => {
@@ -105,8 +105,10 @@ app.get("/stickers-api/get/current/scraping-status", (req, res) => {
 // get current sticker count
 app.get("/stickers-api/get/stickers/count", async (req, res) => {
     try {
+        const stickerCodesCount = scraper.getStickerCodesCount()
         const count = await PersistenceService.getCount()
-        res.status(200).send(String(count))
+        const response = `Saved: ${count} | Total: ${stickerCodesCount}`
+        res.status(200).send(response)
     } catch(err) {
         res.status(500).send(err)
     }

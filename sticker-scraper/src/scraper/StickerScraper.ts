@@ -83,4 +83,8 @@ export class StickerScraper {
     public getCurrentScrapeStatus() {
         return this.shouldScrape
     }
+
+    public getStickerCodesCount() {
+        return this.stickerCodes.length
+    }
 }
