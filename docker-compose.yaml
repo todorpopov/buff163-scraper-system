@@ -12,7 +12,7 @@ services:
     networks:
       - buff163-scraper
     depends_on:
-      - mongo
+      - sticker-scraper
 
   sticker-scraper:
     env_file: ".env"

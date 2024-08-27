@@ -87,4 +87,11 @@ export class StickerScraper {
     public getStickerCodesCount() {
         return this.stickerCodes.length
     }
+
+    public async getPercentageScraped(): Promise<string> {
+        const totalItems = this.stickerCodes.length
+        const currentlyScraped = await PersistenceService.getCount()
+        const percentage = (currentlyScraped / totalItems) * 100
+        return percentage.toFixed(2)
+    }
 }

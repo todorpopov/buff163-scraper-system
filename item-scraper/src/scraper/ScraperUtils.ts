@@ -1,5 +1,6 @@
 import * as fs from 'fs'
 import { CachedSticker } from '../types/CachedSticker.js';
+import { ItemScraper } from './ItemScraper.js';
 
 export class ScraperUtils {
     public static getItemURL(itemCode: string){
@@ -96,15 +97,17 @@ export class ScraperUtils {
         return itemPrice
     }
 
-    public static async fetchStickersCache(){
-        const requestOptions = {
+    private static getStickerServiceHeaders() {
+        return {
             headers: {
                 "auth": process.env.AUTH
             },
             method: "GET",
         }
+    }
 
-        const stickers = await fetch(`http://sticker-scraper:${process.env.STICKER_SCRAPER_PORT}/stickers-api/get/stickers`, requestOptions)
+    public static async fetchStickersCache(): Promise<Array<CachedSticker>> {
+        const stickers = await fetch(`http://sticker-scraper:${process.env.STICKER_SCRAPER_PORT}/stickers-api/get/stickers`, ScraperUtils.getStickerServiceHeaders())
         .then(res => {
             return res.json()
         })
@@ -114,5 +117,30 @@ export class ScraperUtils {
         })
 
         return stickers
+    }
+
+    private static async fetchScrapedStickerPercentage(): Promise<number> {
+        const percentage = await fetch(`http://sticker-scraper:${process.env.STICKER_SCRAPER_PORT}/stickers-api/get/percentage/scraped`, ScraperUtils.getStickerServiceHeaders())
+        .then(res => {
+            return res.text()
+        })
+        .catch(error => {
+            console.error(error)
+            return -1
+        })
+        return Number(percentage)
+    }
+
+    public static async entrypoint(scraper: ItemScraper) {
+        while(true) {
+            const percentage = await ScraperUtils.fetchScrapedStickerPercentage()
+
+            if(percentage >= 95) {
+                scraper.startScraping()
+                break;
+            } else {
+                await ScraperUtils.sleepMs(60000)
+            }
+        }
     }
 }

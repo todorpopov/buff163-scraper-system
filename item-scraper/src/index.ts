@@ -2,6 +2,7 @@ import mongoose from "mongoose"
 import { ItemScraper } from "./scraper/ItemScraper.js"
 import express from 'express'
 import { PersistenceService } from "./persistence/PersistenceService.js"
+import { ScraperUtils } from "./scraper/ScraperUtils.js"
 
 const app = express()
 const port = process.env.ITEM_SCRAPER_PORT
@@ -11,10 +12,10 @@ mongoose.connect('mongodb://mongo:27017/item-scraper', {
     serverSelectionTimeoutMS: 5000
 }).then(
     () => {
-        console.log("Successfully connected to MongoDB!")
+        console.log("\nSuccessfully connected to MongoDB!")
         app.listen(port, () => {
-            console.log(`Express.js item server listenning on port ${port}`)
-            // scraper.startScraping()
+            console.log(`Express.js item server listenning on port ${port}\n`)
+            ScraperUtils.entrypoint(scraper)
         })
     },
     err => {
