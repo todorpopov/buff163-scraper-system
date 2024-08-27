@@ -1,3 +1,4 @@
 AUTH=enter_whatever_authentication_token_you_want
 ITEM_SCRAPER_PORT=port_for_the_item_scraper_server
 STICKER_SCRAPER_PORT=port_for_the_sticker_scraper_server
+API_PORT=port_for_the_api_server
