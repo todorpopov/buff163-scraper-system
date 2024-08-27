@@ -1,6 +1,19 @@
 version: "3.8"
 
 services:
+  api:
+    env_file: ".env"
+    container_name: api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    networks:
+      - buff163-scraper
+    depends_on:
+      - item-scraper
+
   item-scraper:
     env_file: ".env"
     container_name: item-scraper
