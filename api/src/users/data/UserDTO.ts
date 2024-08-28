@@ -1,4 +1,4 @@
-import { RoleNotValid } from "src/errors/RoleNotValid"
+import { RoleNotValid } from "../../errors/RoleNotValid"
 import { Role } from "./Role"
 import { IUser } from "./User"
 

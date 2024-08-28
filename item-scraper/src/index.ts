@@ -6,13 +6,14 @@ import { ScraperUtils } from "./scraper/ScraperUtils.js"
 
 const app = express()
 const port = process.env.ITEM_SCRAPER_PORT
+const mongo_db_port = process.env.MONGO_DB_PORT
 const scraper = new ItemScraper()
 
-mongoose.connect('mongodb://mongo:27017/item-scraper', {
+mongoose.connect(`mongodb://mongo:${mongo_db_port}/item-scraper`, {
     serverSelectionTimeoutMS: 5000
 }).then(
     () => {
-        console.log("\nSuccessfully connected to MongoDB!")
+        console.log(`\nSuccessfully connected to MongoDB on port ${mongo_db_port}!`)
         app.listen(port, () => {
             console.log(`Express.js item server listenning on port ${port}\n`)
             ScraperUtils.entrypoint(scraper)

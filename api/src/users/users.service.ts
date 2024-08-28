@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UserDTO } from './data/UserDTO';
-import { EmailNotValid } from 'src/errors/EmailNotValid';
+import { EmailNotValid } from '../errors/EmailNotValid';
 import { DataConversion } from './data/DataConversion';
 import { IUser } from './data/User';
 import { UserUtils } from './users.utils';

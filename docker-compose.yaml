@@ -44,7 +44,7 @@ services:
     container_name: mongo
     image: mongo:4.0.28-xenial
     ports:
-      - "27017:27017"
+      - "${MONGO_DB_PORT}:${MONGO_DB_PORT}"
     networks:
       - buff163-scraper
     volumes:

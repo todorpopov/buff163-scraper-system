@@ -5,13 +5,14 @@ import { PersistenceService } from "./persistence/PersistenceService.js"
 
 const app = express()
 const port = process.env.STICKER_SCRAPER_PORT
+const mongo_db_port = process.env.MONGO_DB_PORT
 const scraper = new StickerScraper()
 
-mongoose.connect('mongodb://mongo:27017/sticker-scraper', {
+mongoose.connect(`mongodb://mongo:${mongo_db_port}/sticker-scraper`, {
     serverSelectionTimeoutMS: 5000
 }).then(
     () => {
-        console.log("\nSuccessfully connected to MongoDB!")
+        console.log(`Successfully connected to MongoDB on port ${mongo_db_port}!`)
         app.listen(port, () => {
             console.log(`Express.js sticker server listenning on port ${port}\n`)
             // scraper.startScraping()
