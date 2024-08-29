@@ -2,8 +2,21 @@ import { DataConversion } from "./DataConversion.js";
 import { Sticker } from "./data/Sticker.js";
 import { StickerDTO } from "./data/StickerDTO.js";
 
-export class PersistenceService{
-    public static async saveOrUpdate(stickerDto: StickerDTO): Promise<void> {
+export class StickerService{
+    private static instance: StickerService
+
+    private constructor() {}
+
+    static getInstance() {
+        if (this.instance) {
+            return this.instance;
+        }
+
+        this.instance = new StickerService();
+        return this.instance;
+    }
+
+    public async saveOrUpdate(stickerDto: StickerDTO): Promise<void> {
         const exists = await Sticker.exists({code: stickerDto.getCode()})
 
         if(exists === null) {
@@ -14,19 +27,19 @@ export class PersistenceService{
         }
     }
 
-    public static async findOneByCode(code: string): Promise<StickerDTO> {
+    public async findOneByCode(code: string): Promise<StickerDTO> {
         const sticker = await Sticker.findOne({code: code})
         const stickerDto = DataConversion.toDto(sticker)
         return stickerDto
     }
 
-    public static async findOneByName(name: string): Promise<StickerDTO> {
+    public async findOneByName(name: string): Promise<StickerDTO> {
         const sticker = await Sticker.findOne({name: name})
         const stickerDto = DataConversion.toDto(sticker)
         return stickerDto
     }
 
-    public static async getAll(): Promise<Array<StickerDTO>> {
+    public async getAll(): Promise<Array<StickerDTO>> {
         const stickers = await Sticker.find({})
         const stickerDtos = stickers.map(sticker => {
             return DataConversion.toDto(sticker)
@@ -35,11 +48,11 @@ export class PersistenceService{
         return stickerDtos
     }
 
-    public static async dropAll(): Promise<void> {
+    public async dropAll(): Promise<void> {
         await Sticker.deleteMany({})
     }
 
-    public static async getCount(): Promise<number> {
+    public async getCount(): Promise<number> {
         const stickers = await this.getAll()
         return stickers.length
     }

@@ -1,27 +1,12 @@
 import { StickerScraper } from "./scraper/StickerScraper.js"
-import express from 'express'
-import mongoose from "mongoose"
-import { PersistenceService } from "./persistence/PersistenceService.js"
+import { StickerService } from "./persistence/StickerService.js"
+import { GlobalConfig } from "./GlobalConfig.js"
 
-const app = express()
-const port = process.env.STICKER_SCRAPER_PORT
-const mongo_db_port = process.env.MONGO_DB_PORT
-const scraper = new StickerScraper()
+const globalConfig = GlobalConfig.getInstance()
+const app = globalConfig.getApp()
 
-mongoose.connect(`mongodb://mongo:${mongo_db_port}/sticker-scraper`, {
-    serverSelectionTimeoutMS: 5000
-}).then(
-    () => {
-        console.log(`Successfully connected to MongoDB on port ${mongo_db_port}!`)
-        app.listen(port, () => {
-            console.log(`Express.js sticker server listenning on port ${port}\n`)
-            // scraper.startScraping()
-        })
-    },
-    err => {
-        console.log(`DB connection error: ${err}`)
-    }
-)
+const stickerService = StickerService.getInstance()
+const scraper = new StickerScraper(stickerService)
 
 // use auth middleware
 app.use(function(req, res, next) {
@@ -54,7 +39,7 @@ app.put("/stickers-api/stop", (req, res) => {
 // get all stickers route
 app.get("/stickers-api/get/stickers", async (req, res) => {
     try {
-        const stickers = await PersistenceService.getAll()
+        const stickers = await stickerService.getAll()
         res.status(200).send(stickers)
     } catch(err) {
         res.status(500).send(err)
@@ -65,7 +50,7 @@ app.get("/stickers-api/get/stickers", async (req, res) => {
 app.get("/stickers-api/get/sticker/code/:code", async (req, res) => {
     try {
         const code = String(req.params.code)
-        const sticker = await PersistenceService.findOneByCode(code)
+        const sticker = await stickerService.findOneByCode(code)
         res.status(200).send(sticker)
     } catch(err) {
         res.status(500).send(err)
@@ -76,7 +61,7 @@ app.get("/stickers-api/get/sticker/code/:code", async (req, res) => {
 app.get("/stickers-api/get/sticker/name/:name", async (req, res) => {
     try {
         const name = String(req.params.name)
-        const sticker = await PersistenceService.findOneByName(name)
+        const sticker = await stickerService.findOneByName(name)
         res.status(200).send(sticker)
     } catch(err) {
         res.status(500).send(err)
@@ -107,7 +92,7 @@ app.get("/stickers-api/get/current/scraping-status", (req, res) => {
 app.get("/stickers-api/get/stickers/count", async (req, res) => {
     try {
         const stickerCodesCount = scraper.getStickerCodesCount()
-        const count = await PersistenceService.getCount()
+        const count = await stickerService.getCount()
         const response = `Saved: ${count} | Total: ${stickerCodesCount}`
         res.status(200).send(response)
     } catch(err) {
@@ -128,7 +113,7 @@ app.get("/stickers-api/get/percentage/scraped", async (req, res) => {
 // delete all documents
 app.delete("/stickers-api/delete", async (req, res) => {
     try {
-        await PersistenceService.dropAll()
+        await stickerService.dropAll()
         res.status(200).send("All documents in the collection deleted!")
     } catch(err) {
         res.status(500).send(err)

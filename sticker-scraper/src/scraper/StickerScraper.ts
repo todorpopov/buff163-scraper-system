@@ -1,4 +1,4 @@
-import { PersistenceService } from "../persistence/PersistenceService.js";
+import { StickerService } from "../persistence/StickerService.js";
 import { StickerDTO } from "../persistence/data/StickerDTO.js";
 import { ScraperUtils } from "./ScraperUtils.js"
 
@@ -6,11 +6,14 @@ export class StickerScraper {
     private shouldScrape: boolean
     private stickerCodes: Array<string>
     private scrapeDelay: number
+    private stickerService: StickerService
 
-    constructor(){
+    constructor(stickerService: StickerService){
+        this.stickerService = stickerService
         this.shouldScrape = true;
         this.stickerCodes = ScraperUtils.parseStickerCodesFile()
         this.scrapeDelay = 4000;
+        this.startScraping()
     }
 
     private async scrapePage(stickerCode: string){
@@ -43,7 +46,7 @@ export class StickerScraper {
         }
 
         const stickerDto = new StickerDTO(stickerCode, stickerName, stickerPrice)
-        await PersistenceService.saveOrUpdate(stickerDto)
+        await this.stickerService.saveOrUpdate(stickerDto)
         const end = performance.now()
         console.log(`Scraped: ${stickerCode} | took: ${end - start}`)
     }
@@ -90,7 +93,7 @@ export class StickerScraper {
 
     public async getPercentageScraped(): Promise<string> {
         const totalItems = this.stickerCodes.length
-        const currentlyScraped = await PersistenceService.getCount()
+        const currentlyScraped = await this.stickerService.getCount()
         const percentage = (currentlyScraped / totalItems) * 100
         return percentage.toFixed(2)
     }
