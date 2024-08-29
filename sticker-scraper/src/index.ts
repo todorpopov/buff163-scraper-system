@@ -1,12 +1,10 @@
-import { StickerScraper } from "./scraper/StickerScraper.js"
-import { StickerService } from "./persistence/StickerService.js"
 import { GlobalConfig } from "./GlobalConfig.js"
 
 const globalConfig = GlobalConfig.getInstance()
 const app = globalConfig.getApp()
 
-const stickerService = StickerService.getInstance()
-const scraper = new StickerScraper(stickerService)
+const stickerService = globalConfig.getStickerService()
+const scraper = globalConfig.getStickerScraper()
 
 // use auth middleware
 app.use(function(req, res, next) {

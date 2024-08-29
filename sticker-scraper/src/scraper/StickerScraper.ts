@@ -13,7 +13,6 @@ export class StickerScraper {
         this.shouldScrape = true;
         this.stickerCodes = ScraperUtils.parseStickerCodesFile()
         this.scrapeDelay = 4000;
-        this.startScraping()
     }
 
     private async scrapePage(stickerCode: string){
