@@ -1,4 +1,4 @@
-import { RoleNotValid } from "../../errors/RoleNotValid"
+import { RoleNotValid } from "src/exceptions/RoleNotValid"
 import { Role } from "./Role"
 import { IUser } from "./User"
 
@@ -17,7 +17,7 @@ export class UserDTO {
         } else if(role === "user") {
             this.role = Role.User
         } else {
-            throw RoleNotValid("This role is not valid!")
+            throw new RoleNotValid(role)
         }
     }
 

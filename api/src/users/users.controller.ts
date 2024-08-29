@@ -1,30 +1,28 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Controller, Delete, Get, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UserDTO } from './data/UserDTO';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('users')
 export class UsersController {
-    constructor(private userService: UsersService) {}
+    constructor(private usersService: UsersService) {}
 
-    @Post('create')
-    async createUser(@Body() body) {
-        const userDto = new UserDTO(body.username, body.email, body.password, body.role)
+    @UseGuards(AuthGuard)
+    @Get('all/users')
+    async getAllUsers() {
         try {
-            await this.userService.createUser(userDto)
-            return "User successfully created!"
+            const users = await this.usersService.getAllUsers()
+            return users
         } catch(err) {
-            console.log(err)
             return err
         }
     }
 
-    @Get('all')
-    async getAllUsers() {
+    @UseGuards(AuthGuard)
+    @Delete('delete/all/users')
+    async deleteAllUsers() {
         try {
-            const users = await this.userService.getAllUsers()
-            return users
+            await this.usersService.deleteAllUsers()
         } catch(err) {
-            console.log(err)
             return err
         }
     }
