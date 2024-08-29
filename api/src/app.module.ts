@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ProxyController } from './proxy/proxy.controller';
 
 const mongo_db_port = process.env.MONGO_DB_PORT
 
@@ -11,9 +12,9 @@ const mongo_db_port = process.env.MONGO_DB_PORT
       serverSelectionTimeoutMS: 5000,
     }),
     AuthModule,
-    UsersModule
+    UsersModule,
   ],
-  controllers: [],
+  controllers: [ProxyController],
   providers: [],
 })
 export class AppModule {}

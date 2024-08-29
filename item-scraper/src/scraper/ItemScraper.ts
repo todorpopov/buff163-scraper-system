@@ -19,7 +19,6 @@ export class ItemScraper {
     }
 
     public async scrapePage(itemCode: string){
-        const start = performance.now()
         const itemURL = ScraperUtils.getItemURL(itemCode)
         let pageData = await fetch(itemURL, ScraperUtils.getItemRequestOptions()).then(res => {
             if(res.status !== 200){
@@ -64,9 +63,6 @@ export class ItemScraper {
             const itemDto = new ItemDTO(item)
             await this.itemService.saveUnique(itemDto)
         })
-
-        const end = performance.now()
-        console.log(`Scraped: ${itemCode} | took: ${end - start}`)
     }
 
     private async scrapeItemCodes(){
@@ -107,7 +103,6 @@ export class ItemScraper {
         
         while(true) {
             const percentage = await ScraperUtils.fetchScrapedStickerPercentage()
-            console.log(`Current stickers scraped: ${percentage}%`)
 
             if(percentage >= 95) {
                 this.startScraping()

@@ -16,7 +16,6 @@ export class StickerScraper {
     }
 
     private async scrapePage(stickerCode: string){
-        const start = performance.now()
         const url = `https://buff.163.com/api/market/goods/sell_order?game=csgo&goods_id=${stickerCode}`
         const options = {
             method: 'GET',
@@ -46,8 +45,6 @@ export class StickerScraper {
 
         const stickerDto = new StickerDTO(stickerCode, stickerName, stickerPrice)
         await this.stickerService.saveOrUpdate(stickerDto)
-        const end = performance.now()
-        console.log(`Scraped: ${stickerCode} | took: ${end - start}`)
     }
 
     private async scrapeStickerCodes(){
