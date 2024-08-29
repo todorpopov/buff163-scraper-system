@@ -9,7 +9,7 @@ const scraper = globalConfig.getStickerScraper()
 // use auth middleware
 app.use(function(req, res, next) {
     if (req.headers.auth !== process.env.AUTH) {
-        return res.status(403).send("No credentials sent!");
+        return res.status(403).send({msg: "No credentials sent!"});
     }
     next();
 });
@@ -18,7 +18,7 @@ app.use(function(req, res, next) {
 app.put("/stickers-api/start", (req, res) => {
     try {
         scraper.startScraping()
-        res.status(200).send("Scraping process has started!")
+        res.status(200).send()
     } catch(err) {
         res.status(500).send(err)
     }
@@ -28,7 +28,7 @@ app.put("/stickers-api/start", (req, res) => {
 app.put("/stickers-api/stop", (req, res) => {
     try {
         scraper.stopScraping()
-        res.status(200).send("Scraping process has ended!")
+        res.status(200).send()
     } catch(err) {
         res.status(500).send(err)
     }
@@ -89,10 +89,8 @@ app.get("/stickers-api/get/current/scraping-status", (req, res) => {
 // get current sticker count
 app.get("/stickers-api/get/stickers/count", async (req, res) => {
     try {
-        const stickerCodesCount = scraper.getStickerCodesCount()
         const count = await stickerService.getCount()
-        const response = `Saved: ${count} | Total: ${stickerCodesCount}`
-        res.status(200).send(response)
+        res.status(200).send(String(count))
     } catch(err) {
         res.status(500).send(err)
     }
@@ -112,7 +110,7 @@ app.get("/stickers-api/get/percentage/scraped", async (req, res) => {
 app.delete("/stickers-api/delete", async (req, res) => {
     try {
         await stickerService.dropAll()
-        res.status(200).send("All documents in the collection deleted!")
+        res.status(200)
     } catch(err) {
         res.status(500).send(err)
     }
@@ -123,7 +121,7 @@ app.put("/stickers-api/delay", (req, res) => {
     try {
         const delay = String(req.query.delay)
         scraper.changeScrapeDelay(delay)
-        res.status(200).send(`Scraping delay has been changed to ${delay}!`)
+        res.status(200).send()
     } catch(err) {
         res.status(500).send(err)
     }

@@ -119,28 +119,15 @@ export class ScraperUtils {
         return stickers
     }
 
-    private static async fetchScrapedStickerPercentage(): Promise<number> {
+    public static async fetchScrapedStickerPercentage(): Promise<number> {
         const percentage = await fetch(`http://sticker-scraper:${process.env.STICKER_SCRAPER_PORT}/stickers-api/get/percentage/scraped`, ScraperUtils.getStickerServiceHeaders())
         .then(res => {
             return res.text()
         })
         .catch(error => {
             console.error(error)
-            return -1
+            return 0
         })
         return Number(percentage)
-    }
-
-    public static async entrypoint(scraper: ItemScraper) {
-        while(true) {
-            const percentage = await ScraperUtils.fetchScrapedStickerPercentage()
-
-            if(percentage >= 95) {
-                scraper.startScraping()
-                break;
-            } else {
-                await ScraperUtils.sleepMs(60000)
-            }
-        }
     }
 }

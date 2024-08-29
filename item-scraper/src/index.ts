@@ -1,33 +1,15 @@
-import mongoose from "mongoose"
-import { ItemScraper } from "./scraper/ItemScraper.js"
-import express from 'express'
-import { PersistenceService } from "./persistence/PersistenceService.js"
-import { ScraperUtils } from "./scraper/ScraperUtils.js"
+import { GlobalConfig } from "./GlobalConfig.js"
 
-const app = express()
-const port = process.env.ITEM_SCRAPER_PORT
-const mongo_db_port = process.env.MONGO_DB_PORT
-const scraper = new ItemScraper()
+const globalConfig = GlobalConfig.getInstance()
+const app = globalConfig.getApp()
 
-mongoose.connect(`mongodb://mongo:${mongo_db_port}/item-scraper`, {
-    serverSelectionTimeoutMS: 5000
-}).then(
-    () => {
-        console.log(`\nSuccessfully connected to MongoDB on port ${mongo_db_port}!`)
-        app.listen(port, () => {
-            console.log(`Express.js item server listenning on port ${port}\n`)
-            ScraperUtils.entrypoint(scraper)
-        })
-    },
-    err => {
-        console.log(`DB connection error: ${err}`)
-    }
-)
+const itemService = globalConfig.getItemService()
+const itemScraper = globalConfig.getItemScraper()
 
 // use auth middleware
 app.use(function(req, res, next) {
     if (req.headers.auth !== process.env.AUTH) {
-        return res.status(403).send("No credentials sent!");
+        return res.status(403).send({msg: "No credentials sent!"});
     }
     next();
 });
@@ -35,8 +17,8 @@ app.use(function(req, res, next) {
 // start scraping process route
 app.put("/items-api/start", (req, res) => {
     try {
-        scraper.startScraping()
-        res.status(200).send("Scraping process has started!")
+        itemScraper.startScraping()
+        res.status(200).send()
     } catch(err) {
         res.status(500).send(err)
     }
@@ -45,8 +27,8 @@ app.put("/items-api/start", (req, res) => {
 // stop scraping process
 app.put("/items-api/stop", (req, res) => {
     try {
-        scraper.stopScraping()
-        res.status(200).send("Scraping process has stopped!")
+        itemScraper.stopScraping()
+        res.status(200).send()
     } catch(err) {
         res.status(500).send(err)
     }
@@ -55,7 +37,7 @@ app.put("/items-api/stop", (req, res) => {
 // get all items
 app.get("/items-api/get/items", async (req, res) => {
     try {
-        const items = await PersistenceService.getAll()
+        const items = await itemService.getAll()
         res.status(200).send(items)
     } catch(err) {
         res.status(500).send(err)
@@ -65,7 +47,7 @@ app.get("/items-api/get/items", async (req, res) => {
 // get current item count
 app.get("/items-api/get/items/count", async (req, res) => {
     try {
-        const count = await PersistenceService.getCount()
+        const count = await itemService.getCount()
         res.status(200).send(String(count))
     } catch(err) {
         res.status(500).send(err)
@@ -75,8 +57,8 @@ app.get("/items-api/get/items/count", async (req, res) => {
 // delete all documents
 app.delete("/items-api/delete", async (req, res) => {
     try {
-        await PersistenceService.dropAll()
-        res.status(200).send("All documents in the collection deleted!")
+        await itemService.dropAll()
+        res.status(200).send()
     } catch(err) {
         res.status(500).send(err)
     }

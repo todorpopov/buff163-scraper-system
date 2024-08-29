@@ -1,10 +1,22 @@
-import mongoose from "mongoose";
 import { Item } from "./data/Item.js";
 import { ItemDTO } from "./data/ItemDTO.js";
 import { DataConversion } from "./DataConversion.js";
 
-export class PersistenceService {
-    public static async saveUnique(itemDto: ItemDTO) {
+export class ItemService {
+    private static instance: ItemService
+
+    private constructor() {}
+
+    static getInstance() {
+        if (this.instance) {
+            return this.instance;
+        }
+
+        this.instance = new ItemService();
+        return this.instance;
+    }
+
+    public async saveUnique(itemDto: ItemDTO) {
         const exists = await Item.exists({id: itemDto.getId()})
 
         if(exists !== null) {
@@ -15,7 +27,7 @@ export class PersistenceService {
         await itemModel.save()
     }
 
-    public static async getAll(): Promise<Array<ItemDTO>> {
+    public async getAll(): Promise<Array<ItemDTO>> {
         const items = await Item.find({})
         const itemDtos = items.map(item => {
             return DataConversion.toDto(item)
@@ -24,11 +36,11 @@ export class PersistenceService {
         return itemDtos
     }
 
-    public static async dropAll(): Promise<void> {
+    public async dropAll(): Promise<void> {
         await Item.deleteMany({})
     }
 
-    public static async getCount(): Promise<number> {
+    public async getCount(): Promise<number> {
         const items = await this.getAll()
         return items.length
     }

@@ -1,7 +1,7 @@
 import { CachedSticker } from "../types/CachedSticker.js";
 import { IItem } from "../persistence/data/Item.js";
 import { ItemDTO } from "../persistence/data/ItemDTO.js";
-import { PersistenceService } from "../persistence/PersistenceService.js";
+import { ItemService } from "../persistence/ItemService.js";
 import { ScraperUtils } from "../scraper/ScraperUtils.js"
 
 export class ItemScraper {
@@ -9,9 +9,11 @@ export class ItemScraper {
     private itemCodes: Array<string>
     private scrapeDelay: number
     private stickersCache: Array<CachedSticker>
+    private itemService: ItemService
 
-    constructor(){
-        this.shouldScrape = true;
+    constructor(itemService: ItemService){
+        this.itemService = itemService
+        this.shouldScrape = false;
         this.itemCodes = ScraperUtils.parseItemCodesFile()
         this.scrapeDelay = 5000;
     }
@@ -60,7 +62,7 @@ export class ItemScraper {
 
         editedItems.forEach(async (item: IItem) => {
             const itemDto = new ItemDTO(item)
-            await PersistenceService.saveUnique(itemDto)
+            await this.itemService.saveUnique(itemDto)
         })
 
         const end = performance.now()
@@ -98,5 +100,21 @@ export class ItemScraper {
 
     private async updateStickersCache() {
         this.stickersCache = await ScraperUtils.fetchStickersCache()
+    }
+
+    public async entrypoint() {
+        if(this.shouldScrape) {return}
+        
+        while(true) {
+            const percentage = await ScraperUtils.fetchScrapedStickerPercentage()
+            console.log(`Current stickers scraped: ${percentage}%`)
+
+            if(percentage >= 95) {
+                this.startScraping()
+                break;
+            } else {
+                await ScraperUtils.sleepMs(60000)
+            }
+        }
     }
 }

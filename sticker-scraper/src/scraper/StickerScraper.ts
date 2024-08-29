@@ -10,7 +10,7 @@ export class StickerScraper {
 
     constructor(stickerService: StickerService){
         this.stickerService = stickerService
-        this.shouldScrape = true;
+        this.shouldScrape = false;
         this.stickerCodes = ScraperUtils.parseStickerCodesFile()
         this.scrapeDelay = 4000;
     }
@@ -84,10 +84,6 @@ export class StickerScraper {
 
     public getCurrentScrapeStatus() {
         return this.shouldScrape
-    }
-
-    public getStickerCodesCount() {
-        return this.stickerCodes.length
     }
 
     public async getPercentageScraped(): Promise<string> {
