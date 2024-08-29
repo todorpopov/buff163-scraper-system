@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { UserDTO } from '../users/data/UserDTO';
 import { AuthService } from './auth.service';
@@ -18,7 +18,7 @@ export class AuthController {
         const userDto = new UserDTO(body.username, body.email, body.password, body.role)
         try {
             await this.usersService.createUser(userDto)
-            return "User successfully created!"
+            return { msg: "User successfully created!" }
         } catch(error) {
             return error
         }
