@@ -45,7 +45,6 @@ export class AdminGuard implements CanActivate {
 
         try {
             const decodedPayload = JSON.parse(atob(payload))
-            console.log(decodedPayload)
             return decodedPayload?.role
         } catch {
             throw new NotFoundException('Could not find user permissions!')
