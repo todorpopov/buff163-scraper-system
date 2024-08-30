@@ -1,26 +1,25 @@
-import { CachedSticker } from "../types/CachedSticker.js";
 import { IItem } from "../persistence/data/Item.js";
 import { ItemDTO } from "../persistence/data/ItemDTO.js";
 import { ItemService } from "../persistence/ItemService.js";
-import { ScraperUtils } from "../scraper/ScraperUtils.js"
+import { StickerService } from "../../sticker-scraper/persistence/StickerService.js";
+import { Utils } from "../../Utils.js";
 
 export class ItemScraper {
     private shouldScrape: boolean
-    private itemCodes: Array<string>
     private scrapeDelay: number
-    private stickersCache: Array<CachedSticker>
     private itemService: ItemService
+    private stickerService: StickerService
 
-    constructor(itemService: ItemService){
+    constructor(itemService: ItemService, stickerService: StickerService){
         this.itemService = itemService
+        this.stickerService = stickerService
         this.shouldScrape = false;
-        this.itemCodes = ScraperUtils.parseItemCodesFile()
         this.scrapeDelay = 5000;
     }
 
     public async scrapePage(itemCode: string){
-        const itemURL = ScraperUtils.getItemURL(itemCode)
-        let pageData = await fetch(itemURL, ScraperUtils.getItemRequestOptions()).then(res => {
+        const itemURL = Utils.getItemURL(itemCode)
+        let pageData = await fetch(itemURL, Utils.getItemRequestOptions()).then(res => {
             if(res.status !== 200){
                 console.log(`\nStatus code: ${res.status}!`)
             }
@@ -49,15 +48,29 @@ export class ItemScraper {
             return item?.asset_info?.info.stickers?.length !== 0
         })
 
-        const commonProperties = {
-            with_stickers: itemsWithStickers,
-            stickers_cache: this.stickersCache,
-            item_img_url: itemImgURL,
-            item_name: ScraperUtils.parseItemName(itemName),
-            item_ref_price: itemReferencePrice, 
-        }
-
-        const editedItems = ScraperUtils.getItems(commonProperties)
+        const editedItems = itemsWithStickers.map(item => {
+            let stickers = [...item.asset_info.info.stickers]
+                stickers.map(async (sticker) => {
+                    delete sticker.category
+                    delete sticker.sticker_id
+                    delete sticker?.offset_x
+                    delete sticker?.offset_y
+                
+                    sticker.price = await this.getStickerPrice(sticker.name)
+                })
+        
+            return { 
+                id: item.asset_info.assetid,
+                img_url: itemImgURL,
+                name: Utils.parseItemName(itemName),
+                price: Number(item.price),
+                reference_price: Number(itemReferencePrice),
+                number_of_stickers: stickers.length,
+                stickers: stickers,
+                item_offer_url: Utils.getItemOfferURL(item.user_id, Utils.parseItemName(itemName)),
+                paintwear: item.asset_info.paintwear
+            }
+        })
 
         editedItems.forEach(async (item: IItem) => {
             const itemDto = new ItemDTO(item)
@@ -66,13 +79,13 @@ export class ItemScraper {
     }
 
     private async scrapeItemCodes(){
-        await this.updateStickersCache()
-        for(const itemCode of this.itemCodes){
+        const itemCodes = this.itemService.getItemCodes()
+        for(const itemCode of itemCodes){
             if(!this.shouldScrape){
                 break;
             }
             await this.scrapePage(itemCode)
-            await ScraperUtils.sleepMs(this.scrapeDelay)
+            await Utils.sleepMs(this.scrapeDelay)
         }
     }
 
@@ -94,22 +107,29 @@ export class ItemScraper {
         this.scrapeDelay = Number(newDelay)
     }
 
-    private async updateStickersCache() {
-        this.stickersCache = await ScraperUtils.fetchStickersCache()
-    }
-
     public async entrypoint() {
         if(this.shouldScrape) {return}
         
         while(true) {
-            const percentage = await ScraperUtils.fetchScrapedStickerPercentage()
+            const percentage = await this.stickerService.getPercentageScraped()
+            console.log(`Stickers scraped percentage: ${percentage}`)
 
-            if(percentage >= 95) {
+            if(Number(percentage) >= 95) {
                 this.startScraping()
                 break;
             } else {
-                await ScraperUtils.sleepMs(60000)
+                await Utils.sleepMs(60000)
             }
+        }
+    }
+
+    private async getStickerPrice(name: string) {
+        name = `Sticker | ${name}`
+        try {
+            const stickerDTO = await this.stickerService.findOneByName(name)
+            return stickerDTO.getPrice()
+        } catch {
+            return -1
         }
     }
 }

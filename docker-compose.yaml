@@ -12,29 +12,16 @@ services:
     networks:
       - buff163-scraper
     depends_on:
-      - item-scraper
+      - scraper-service
 
-  item-scraper:
+  scraper-service:
     env_file: ".env"
-    container_name: item-scraper
+    container_name: scraper-service
     build:
-      context: ./item-scraper
+      context: ./scraper-service
       dockerfile: Dockerfile
     ports:
-      - "${ITEM_SCRAPER_PORT}:${ITEM_SCRAPER_PORT}"
-    networks:
-      - buff163-scraper
-    depends_on:
-      - sticker-scraper
-
-  sticker-scraper:
-    env_file: ".env"
-    container_name: sticker-scraper
-    build:
-      context: ./sticker-scraper
-      dockerfile: Dockerfile
-    ports:
-      - "${STICKER_SCRAPER_PORT}:${STICKER_SCRAPER_PORT}"
+      - "${SCRAPER_SERVICE_PORT}:${SCRAPER_SERVICE_PORT}"
     networks:
       - buff163-scraper
     depends_on:

@@ -12,6 +12,6 @@ COPY . /app
 
 RUN npm run build
 
-EXPOSE ${ITEM_SCRAPER_PORT}
+EXPOSE ${SCRAPER_SERVICE_PORT}
 
 CMD [ "npm", "run", "start" ]

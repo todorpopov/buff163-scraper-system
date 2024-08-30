@@ -1,11 +1,14 @@
 import { DataConversion } from "./DataConversion.js";
 import { Sticker } from "./data/Sticker.js";
 import { StickerDTO } from "./data/StickerDTO.js";
+import * as fs from 'fs'
 
 export class StickerService{
     private static instance: StickerService
-
-    private constructor() {}
+    private stickerCodes: Array<string>
+    private constructor() {
+        this.stickerCodes = this.parseStickerCodesFile()
+    }
 
     static getInstance() {
         if (this.instance) {
@@ -14,6 +17,22 @@ export class StickerService{
 
         this.instance = new StickerService();
         return this.instance;
+    }
+
+    private parseStickerCodesFile(): Array<string>{
+        let stickerCodes = []
+        try {
+            const data = fs.readFileSync('./src/sticker-scraper/files/sticker-codes.txt', 'utf8')
+            const splitLines = data.split('\n')
+            for(let i = 0; i < splitLines.length; i++) {
+                const splitLine = splitLines[i].split(';')
+                stickerCodes.push(splitLine[0])
+            }
+        } catch (err) {
+            console.log(err);
+        }
+
+        return stickerCodes
     }
 
     public async saveOrUpdate(stickerDto: StickerDTO): Promise<void> {
@@ -55,5 +74,20 @@ export class StickerService{
     public async getCount(): Promise<number> {
         const stickers = await this.getAll()
         return stickers.length
+    }
+
+    public getStickerCodes(): Array<string> {
+        return this.stickerCodes
+    }
+
+    public getStickerCodesCount(): number {
+        return this.stickerCodes.length
+    }
+
+    public async getPercentageScraped(): Promise<string> {
+        const totalItems = this.getStickerCodesCount()
+        const currentlyScraped = await this.getCount()
+        const percentage = (currentlyScraped / totalItems) * 100
+        return percentage.toFixed(2)
     }
 }

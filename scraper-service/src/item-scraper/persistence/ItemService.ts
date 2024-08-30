@@ -1,11 +1,15 @@
 import { Item } from "./data/Item.js";
 import { ItemDTO } from "./data/ItemDTO.js";
 import { DataConversion } from "./DataConversion.js";
+import * as fs from 'fs';
 
 export class ItemService {
     private static instance: ItemService
+    private itemCodes: Array<string>
 
-    private constructor() {}
+    private constructor() {
+        this.itemCodes = this.parseItemCodesFile()
+    }
 
     static getInstance() {
         if (this.instance) {
@@ -14,6 +18,15 @@ export class ItemService {
 
         this.instance = new ItemService();
         return this.instance;
+    }
+
+    private parseItemCodesFile(): Array<string>{
+        try{
+            const data = fs.readFileSync('./src/item-scraper/files/item-codes.txt', 'utf8')
+            return data.split('|')
+        }catch(error){
+            console.error(error)
+        }
     }
 
     public async saveUnique(itemDto: ItemDTO) {
@@ -43,5 +56,13 @@ export class ItemService {
     public async getCount(): Promise<number> {
         const items = await this.getAll()
         return items.length
+    }
+
+    public getItemCodes(): Array<string> {
+        return this.itemCodes
+    }
+
+    public getItemCodesCount(): number {
+        return this.itemCodes.length
     }
 }
