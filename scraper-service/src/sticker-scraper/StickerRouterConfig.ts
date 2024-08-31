@@ -96,7 +96,7 @@ export class StickerRouterConfig {
             }
         })
 
-        this.router.get("/get/percentage/", async (req, res) => {
+        this.router.get("/get/percentage", async (req, res) => {
             try {
                 const response = await this.stickerServiceInstance.getPercentageScraped()
                 res.status(200).send(response)

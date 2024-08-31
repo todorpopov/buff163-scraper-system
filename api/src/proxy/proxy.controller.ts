@@ -9,89 +9,101 @@ export class ProxyController {
 
 
     // Sticker Scraper Service
-    @Put('/stickers-api/start')
+    @Put('/stickers/start')
     @UseGuards(AuthGuard, AdminGuard)
     startStickerScraping(@Res() res) {
-        return res.redirect(this.stickerScraperURL + '/stickers-api/start')
+        return res.redirect(this.stickerScraperURL + '/stickers/start')
     }
 
-    @Put('/stickers-api/stop')
+    @Put('/stickers/stop')
     @UseGuards(AuthGuard, AdminGuard)
     stopStickerScraping(@Res() res) {
-        return res.redirect(this.stickerScraperURL + '/stickers-api/stop')
+        return res.redirect(this.stickerScraperURL + '/stickers/stop')
     }
 
-    @Get('/stickers-api/get/stickers')
+    @Get('/stickers/get/all')
     @UseGuards(AuthGuard)
     getStickers(@Res() res) {
-        return res.redirect(this.stickerScraperURL + '/stickers-api/get/stickers')
+        return res.redirect(this.stickerScraperURL + '/stickers/get/all')
     }
 
-    @Get('/stickers-api/get/current/delay')
+    @Get('/stickers/get/delay')
     @UseGuards(AuthGuard, AdminGuard)
     getCurrentDelay(@Res() res) {
-        return res.redirect(this.stickerScraperURL + '/stickers-api/get/current/delay')
+        return res.redirect(this.stickerScraperURL + '/stickers/get/delay')
     }
 
-    @Get('/stickers-api/get/current/scraping-status')
+    @Get('/stickers/get/status')
     @UseGuards(AuthGuard)
     getCurrentScrapingStatus(@Res() res) {
-        return res.redirect(this.stickerScraperURL + '/stickers-api/get/current/scraping-status')
+        return res.redirect(this.stickerScraperURL + '/stickers/get/status')
     }
 
-    @Get('/stickers-api/get/stickers/count')
+    @Get('/stickers/get/count')
     @UseGuards(AuthGuard)
     getStickersCount(@Res() res) {
-        return res.redirect(this.stickerScraperURL + '/stickers-api/get/stickers/count')
+        return res.redirect(this.stickerScraperURL + '/stickers/get/count')
     }
 
-    @Get('/stickers-api/get/percentage/scraped')
+    @Get('/stickers/get/codes/count')
+    @UseGuards(AuthGuard)
+    getStickersCodesCount(@Res() res) {
+        return res.redirect(this.stickerScraperURL + '/stickers/get/codes/count')
+    }
+
+    @Get('/stickers/get/percentage')
     @UseGuards(AuthGuard, AdminGuard)
     getPercentageScraped(@Res() res) {
-        return res.redirect(this.stickerScraperURL + '/stickers-api/get/percentage/scraped')
+        return res.redirect(this.stickerScraperURL + '/stickers/get/percentage')
     }
 
-    @Delete('/stickers-api/delete')
+    @Delete('/stickers/delete/all')
     @UseGuards(AuthGuard, AdminGuard)
     deleteAllStickers(@Res() res) {
-        return res.redirect(this.stickerScraperURL + '/stickers-api/delete')
+        return res.redirect(this.stickerScraperURL + '/stickers/delete/all')
     }
 
-    @Put('/stickers-api/delay')
+    @Put('/stickers/change/delay')
     @UseGuards(AuthGuard, AdminGuard)
     changeDelay(@Res() res) {
-        return res.redirect(this.stickerScraperURL + '/stickers-api/delay')
+        return res.redirect(this.stickerScraperURL + '/stickers/change/delay')
     }
 
 
     // Item Scraper Service
-    @Put('/items-api/start')
+    @Put('/items/start')
     @UseGuards(AuthGuard, AdminGuard)
     startItemScraping(@Res() res) {
-        return res.redirect(this.itemScraperURL + '/items-api/start')
+        return res.redirect(this.itemScraperURL + '/items/start')
     }
 
-    @Put('/items-api/stop')
+    @Put('/items/stop')
     @UseGuards(AuthGuard, AdminGuard)
     stopItemScraping(@Res() res) {
-        return res.redirect(this.itemScraperURL + '/items-api/stop')
+        return res.redirect(this.itemScraperURL + '/items/stop')
     }
 
-    @Get('/items-api/get/items')
+    @Get('/items/get/all')
     @UseGuards(AuthGuard)
     getItems(@Res() res) {
-        return res.redirect(this.itemScraperURL + '/items-api/get/items')
+        return res.redirect(this.itemScraperURL + '/items/get/all')
     }
 
-    @Get('/items-api/get/items/count')
+    @Get('/items/get/count')
     @UseGuards(AuthGuard)
     getItemsCount(@Res() res) {
-        return res.redirect(this.itemScraperURL + '/items-api/get/items/count')
+        return res.redirect(this.itemScraperURL + '/items/get/count')
     }
 
-    @Delete('/items-api/delete')
+    @Get('/items/get/codes/count')
+    @UseGuards(AuthGuard)
+    getItemCodesCount(@Res() res) {
+        return res.redirect(this.itemScraperURL + '/items/get/codes/count')
+    }
+
+    @Delete('/items/delete/all')
     @UseGuards(AuthGuard, AdminGuard)
     deleteAllItems(@Res() res) {
-        return res.redirect(this.itemScraperURL + '/items-api/delete')
+        return res.redirect(this.itemScraperURL + '/items/delete/all')
     }
 }
