@@ -1,9 +1,10 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { UserDTO } from '../users/data/UserDTO';
 import { AuthService } from './auth.service';
-import { Response , Request} from 'express'
+import { Response } from 'express'
 import { UserCannotBeRegistered } from 'src/exceptions/UserCannotBeRegistered';
+import { LoggedInGuard } from './guards/logged.in.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -25,6 +26,7 @@ export class AuthController {
     }
 
     @Post('login')
+    @UseGuards(LoggedInGuard)
     async login(@Body() body, @Res({ passthrough: true }) response: Response) {
         try {
             const token = await this.authService.signIn(body.email, body.password)
