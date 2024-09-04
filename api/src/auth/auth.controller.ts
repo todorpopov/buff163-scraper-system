@@ -1,8 +1,8 @@
-import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { UserDTO } from '../users/data/UserDTO';
 import { AuthService } from './auth.service';
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import { UserCannotBeRegistered } from 'src/exceptions/UserCannotBeRegistered';
 import { LoggedInGuard } from './guards/logged.in.guard';
 
@@ -19,7 +19,7 @@ export class AuthController {
         const userDto = new UserDTO(body.username, body.email, body.password, body.role)
         try {
             await this.usersService.createUser(userDto)
-            return { msg: "User successfully created!" }
+            return { responseCode: 200 }
         } catch(error) {
             return error
         }
@@ -33,9 +33,9 @@ export class AuthController {
             response.cookie('token', token, { 
                 sameSite: "none",
                 secure: true, 
-            }).status(200)
+            }).status(200).send({ responseCode: 200 })
         } catch(error) {
-            return error
+            return error.response
         }
     }
 
@@ -44,6 +44,12 @@ export class AuthController {
         response.clearCookie('token', { 
             sameSite: "none",
             secure: true, 
-        }).status(200)
+        }).status(200).send({ responseCode: 200 })
+    }
+
+    @Get('current-user')
+    getCurrentUser(@Req() request: Request) {
+        const token = request.cookies?.token
+        return this.authService.getCurrentUser(token)
     }
 }

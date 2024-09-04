@@ -47,4 +47,20 @@ export class AuthService {
             return false
         }
     }
+
+    public getCurrentUser(token: string) {
+        if(token === undefined) {
+            return { loggedIn: false }
+        }
+
+        const username = this.getUsernameFromToken(token)
+        return { loggedIn: true, username: username}
+    }
+
+    private getUsernameFromToken(token: string) {
+        const tokenArray = token.split('.')
+        const payload = tokenArray[1]
+        const decodedPayload = JSON.parse(atob(payload))
+        return decodedPayload?.username
+    }
 }

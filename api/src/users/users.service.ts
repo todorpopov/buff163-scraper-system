@@ -50,7 +50,7 @@ export class UsersService {
         const user = await this.userModel.findOne({ email: email }) 
 
         if(user === null) {
-            throw new NotFoundException('User not found!', `No user with email (${email}) found!`)
+            throw new NotFoundException('User not found!')
         }
 
         const userDto = DataConversion.toDto(user)

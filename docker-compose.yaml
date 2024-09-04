@@ -1,6 +1,19 @@
 version: "3.8"
 
 services:
+  frontend:
+    env_file: ".env"
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "${PORT}:${PORT}"
+    networks:
+      - buff163-scraper
+    depends_on:
+      - api
+
   api:
     env_file: ".env"
     container_name: api
@@ -8,7 +21,7 @@ services:
       context: ./api
       dockerfile: Dockerfile
     ports:
-      - "${API_PORT}:${API_PORT}"
+      - "${REACT_APP_API_PORT}:${REACT_APP_API_PORT}"
     networks:
       - buff163-scraper
     depends_on:

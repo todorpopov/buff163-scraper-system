@@ -12,6 +12,6 @@ COPY . /app
 
 RUN npm run build
 
-EXPOSE ${REACT_APP_API_PORT}
+EXPOSE ${PORT}
 
-CMD [ "npm", "run", "start:prod" ]
+CMD [ "npm", "run", "start" ]
